@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Teorema de la modulación en señales y sistemas: demostración, interpretación espectral, demodulación, AM, tipos de modulación y aplicaciones." />
+  <meta name="author" content="Señales y Sistemas" />
+  <title>Teorema de la modulación · Señales y Sistemas</title>
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="dist/reset.css" />
+  <link rel="stylesheet" href="dist/reveal.css" />
+  <link rel="stylesheet" href="dist/theme/black.css" />
+  <link rel="stylesheet" href="css/custom.css" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ============================================================
+           1 · PORTADA
+           ============================================================ -->
+      <section class="title-slide" data-background-color="#060a14">
+        <div class="cover">
+          <div class="eyebrow" style="justify-content:center;">Señales y Sistemas · Ingeniería</div>
+          <h1 class="cover-title">Teorema de la<br /><span class="grad">modulación</span></h1>
+          <p class="cover-sub">
+            Cómo multiplicar una señal por un coseno desplaza su espectro — y por qué
+            ese desplazamiento hace posible la radio, la televisión y las comunicaciones móviles.
+          </p>
+          <div class="cover-meta">
+            <span class="pill">Transformada de Fourier</span>
+            <span class="pill violet">Demostración paso a paso</span>
+            <span class="pill violet">Espectros interactivos</span>
+          </div>
+          <div class="hint">
+            Usa <span class="kbd">←</span> <span class="kbd">→</span> para navegar
+            &nbsp;·&nbsp; <span class="kbd">F</span> pantalla completa
+            &nbsp;·&nbsp; <span class="kbd">S</span> notas del expositor
+          </div>
+        </div>
+
+        <svg class="cover-waves" viewBox="0 0 1400 240" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="waveGradA" x1="0" x2="1">
+              <stop offset="0" stop-color="#22d3ee" stop-opacity="0" />
+              <stop offset="0.35" stop-color="#22d3ee" />
+              <stop offset="0.75" stop-color="#a78bfa" />
+              <stop offset="1" stop-color="#a78bfa" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id="waveGradB" x1="0" x2="1">
+              <stop offset="0" stop-color="#a78bfa" stop-opacity="0" />
+              <stop offset="0.5" stop-color="#a78bfa" />
+              <stop offset="1" stop-color="#f472b6" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id="waveGradC" x1="0" x2="1">
+              <stop offset="0" stop-color="#22d3ee" stop-opacity="0" />
+              <stop offset="0.6" stop-color="#67e8f9" />
+              <stop offset="1" stop-color="#22d3ee" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <path id="wave1" class="wave-a" />
+          <path id="wave2" class="wave-b" />
+          <path id="wave3" class="wave-c" />
+        </svg>
+
+        <aside class="notes">
+          Presentar el tema: el teorema de la modulación es la propiedad de la transformada
+          de Fourier que explica qué ocurre en frecuencia cuando multiplicamos una señal por
+          un coseno. Es la base matemática de la modulación en comunicaciones.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           2 · AGENDA
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">Recorrido</div>
+        <h2>Qué vamos a ver</h2>
+        <p class="subtitle">Del enunciado formal a las aplicaciones reales, con visualizaciones interactivas en el camino.</p>
+
+        <div class="grid g3" style="margin-bottom:16px;">
+          <div class="card">
+            <h3><span class="num">01</span>Motivación</h3>
+            <p>Por qué necesitamos trasladar señales a bandas de frecuencia altas.</p>
+          </div>
+          <div class="card">
+            <h3><span class="num">02</span>El teorema</h3>
+            <p>Enunciado, condiciones y relación con la transformada de Fourier.</p>
+          </div>
+          <div class="card">
+            <h3><span class="num">03</span>Demostración</h3>
+            <p>Identidad de Euler, linealidad y propiedad de desplazamiento.</p>
+          </div>
+          <div class="card violet">
+            <h3><span class="num">04</span>Interpretación espectral</h3>
+            <p>Visualización interactiva: mueve la portadora y observa las réplicas.</p>
+          </div>
+          <div class="card violet">
+            <h3><span class="num">05</span>Demodulación y AM</h3>
+            <p>Recuperar la señal original y construir una señal AM en tiempo real.</p>
+          </div>
+          <div class="card violet">
+            <h3><span class="num">06</span>Tipos y aplicaciones</h3>
+            <p>DSB, SSB, FM, I/Q, QAM y los sistemas que usan estas ideas.</p>
+          </div>
+        </div>
+
+        <div class="callout">
+          <span class="icon">◎</span>
+          <span><strong>Objetivo:</strong> al terminar, deberías poder enunciar el teorema, demostrarlo y explicar cómo se aplica en un receptor de radio o en un módem digital.</span>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           3 · MOTIVACIÓN
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">El problema</div>
+        <h2>¿Por qué modular?</h2>
+        <p class="subtitle">La voz humana ocupa pocos kilohercios. Transmitirla directamente es técnicamente inviable.</p>
+
+        <div class="split align-start">
+          <div>
+            <div class="formula-box center">
+              <span class="label">Longitud de onda</span>
+              \[ \lambda = \frac{c}{f}, \qquad \text{antena } \lambda/4 = \frac{c}{4f} \]
+            </div>
+            <ul class="clean">
+              <li>Una señal de <strong>4 kHz</strong> requeriría una antena de unos <strong>18.75 km</strong>.</li>
+              <li>A <strong>100 MHz</strong>, la misma antena mide <strong>0.75 m</strong>.</li>
+              <li>El espectro es un recurso compartido: cada emisora necesita <strong>su propia banda</strong>.</li>
+            </ul>
+          </div>
+
+          <div class="grid" style="gap:12px;">
+            <div class="card">
+              <h3>Antenas manejables</h3>
+              <p>Modular traslada la información a frecuencias altas, donde las antenas tienen dimensiones prácticas.</p>
+            </div>
+            <div class="card">
+              <h3>Multiplexado en frecuencia</h3>
+              <p>Muchas señales pueden convivir si cada una ocupa una banda distinta del espectro.</p>
+            </div>
+            <div class="card violet">
+              <h3>Mejor relación señal/ruido</h3>
+              <p>La información viaja en una banda elegida para evitar interferencias y ruido de baja frecuencia.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout warn" style="margin-top:14px;">
+          <span class="icon">!</span>
+          <span>Modular <strong>no crea información</strong>: solo la traslada a una región del espectro donde el canal y la antena son eficientes.</span>
+        </div>
+
+        <aside class="notes">
+          Enfatizar la relación entre frecuencia y tamaño de antena. Con 4 kHz, lambda/4 son casi 19 km.
+          La modulación resuelve simultáneamente el problema físico (antena) y el de compartición del canal.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           4 · REPASO: TF Y PROPIEDADES
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">Herramientas</div>
+        <h2>Repaso: la transformada de Fourier</h2>
+        <p class="subtitle">Todo el teorema se apoya en dos ideas: la linealidad y el desplazamiento en frecuencia.</p>
+
+        <div class="formula-box center" style="margin-bottom:16px;">
+          <span class="label">Par de transformadas</span>
+          \[ X(\omega)=\int_{-\infty}^{\infty} x(t)\,e^{-j\omega t}\,dt
+             \qquad\longleftrightarrow\qquad
+             x(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty} X(\omega)\,e^{j\omega t}\,d\omega \]
+        </div>
+
+        <div class="grid g3">
+          <div class="card">
+            <h3>Linealidad</h3>
+            <p>\[ \mathcal{F}\{a\,x_1(t)+b\,x_2(t)\}=a\,X_1(\omega)+b\,X_2(\omega) \]</p>
+          </div>
+          <div class="card">
+            <h3>Desplazamiento en frecuencia</h3>
+            <p>\[ x(t)\,e^{j\omega_0 t}\;\longleftrightarrow\;X(\omega-\omega_0) \]</p>
+          </div>
+          <div class="card">
+            <h3>Identidad de Euler</h3>
+            <p>\[ \cos\theta=\frac{e^{j\theta}+e^{-j\theta}}{2} \]</p>
+          </div>
+        </div>
+
+        <div class="callout" style="margin-top:16px;">
+          <span class="icon">→</span>
+          <span>Un coseno no es una sola frecuencia: son <strong>dos exponenciales complejas</strong> en \(+\omega_0\) y \(-\omega_0\). Esa es la clave del desplazamiento doble.</span>
+        </div>
+
+        <aside class="notes">
+          Recordar que para señales reales el espectro es simétrico: |X(-w)| = |X(w)|.
+          El coseno tiene transformada pi[delta(w-w0) + delta(w+w0)].
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           5 · ENUNCIADO
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">El resultado central</div>
+        <h2>Teorema de la modulación</h2>
+
+        <div class="formula-box big-formula center">
+          <span class="label">Teorema</span>
+          \[
+            \boxed{\;
+              x(t)\cos(\omega_0 t)
+              \;\longleftrightarrow\;
+              \tfrac{1}{2}\bigl[X(\omega-\omega_0)+X(\omega+\omega_0)\bigr]
+            \;}
+          \]
+        </div>
+
+        <div class="grid g3" style="margin-top:6px;">
+          <div class="card">
+            <h3>Qué dice</h3>
+            <p>Multiplicar por un coseno <strong>copia</strong> el espectro y lo <strong>desplaza</strong> a \(\pm\omega_0\), con amplitud mitad.</p>
+          </div>
+          <div class="card">
+            <h3>Condiciones</h3>
+            <p>\(x(t)\) real y con transformada \(X(\omega)\); \(\omega_0\) real. El factor \(\tfrac12\) aparece porque el coseno reparte la potencia entre dos réplicas.</p>
+          </div>
+          <div class="card">
+            <h3>También en \(f\)</h3>
+            <p>\[ x(t)\cos(2\pi f_0 t)\leftrightarrow\tfrac12[X(f-f_0)+X(f+f_0)] \]</p>
+          </div>
+        </div>
+
+        <div class="callout" style="margin-top:16px;">
+          <span class="icon">◎</span>
+          <span>El teorema es la <strong>propiedad de desplazamiento</strong> aplicada a las dos exponenciales del coseno. Nada más, y nada menos.</span>
+        </div>
+
+        <aside class="notes">
+          Leer la formula en voz alta. Destacar el factor 1/2: cada replica tiene la mitad de la energia.
+          La version con f0 es la que se usa en ingenieria; ambas son equivalentes porque w = 2 pi f.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           6 · DEMOSTRACIÓN
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">Demostración</div>
+        <h2>Tres pasos, dos propiedades</h2>
+
+        <div class="formula-box" style="font-size:0.94em;">
+          <span class="label">Paso 1 · Euler</span>
+          \[ x(t)\cos(\omega_0 t)
+             = \frac{x(t)}{2}\,e^{j\omega_0 t}+\frac{x(t)}{2}\,e^{-j\omega_0 t} \]
+        </div>
+
+        <div class="formula-box fragment fade-in" style="font-size:0.94em;">
+          <span class="label">Paso 2 · Linealidad de \(\mathcal{F}\)</span>
+          \[ \mathcal{F}\{x(t)\cos(\omega_0 t)\}
+             = \frac{1}{2}\,\mathcal{F}\{x(t)e^{j\omega_0 t}\}
+             + \frac{1}{2}\,\mathcal{F}\{x(t)e^{-j\omega_0 t}\} \]
+        </div>
+
+        <div class="formula-box violet fragment fade-in" style="font-size:0.94em;">
+          <span class="label">Paso 3 · Desplazamiento en frecuencia</span>
+          \[ \mathcal{F}\{x(t)e^{\pm j\omega_0 t}\}=X(\omega\mp\omega_0)
+             \quad\Longrightarrow\quad
+             \boxed{\;\tfrac12\bigl[X(\omega-\omega_0)+X(\omega+\omega_0)\bigr]\;} \]
+        </div>
+
+        <div class="callout fragment fade-in" style="margin-top:8px;">
+          <span class="icon">✓</span>
+          <span><strong>QED.</strong> La información no se duplica ni se destruye: queda codificada en <strong>dos réplicas espectrales</strong> de media amplitud.</span>
+        </div>
+
+        <aside class="notes">
+          Avanzar con fragments: primero Euler, luego linealidad, finalmente la propiedad de desplazamiento.
+          Preguntar al publico por que aparece el factor 1/2 antes de revelar el paso 3.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           7 · ESPECTRO INTERACTIVO
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">Visualización interactiva</div>
+        <h2>El espectro se desplaza</h2>
+        <p class="subtitle">Señal de banda base de 4 kHz. Mueve la portadora y observa las dos réplicas de amplitud mitad.</p>
+
+        <div class="viz">
+          <canvas id="spectrumCanvas" width="1000" height="300" aria-label="Espectro de la señal modulada"></canvas>
+          <div class="controls-row">
+            <label for="fcRange">Frecuencia de la portadora</label>
+            <input type="range" id="fcRange" min="2" max="20" step="0.5" value="10" />
+            <span class="readout" id="fcValue">f₀ = 10.0 kHz</span>
+            <span class="badge" id="overlapBadge">Réplicas separadas</span>
+            <label class="toggle"><input type="checkbox" id="showBase" /> Banda base original</label>
+          </div>
+        </div>
+
+        <div class="grid g2" style="margin-top:12px;">
+          <div class="callout">
+            <span class="icon">◎</span>
+            <span>Para una señal real las dos réplicas son <strong>conjugadas</strong>; basta analizar la que está en frecuencias positivas.</span>
+          </div>
+          <div class="callout warn">
+            <span class="icon">!</span>
+            <span>Si \(f_0 < B\), las réplicas se <strong>solapan entre sí</strong> cerca de \(0\) Hz y la demodulación lineal ya no puede separarlas.</span>
+          </div>
+        </div>
+
+        <aside class="notes">
+          Mover el slider durante la explicacion. Con f0 &lt; B se observa el solapamiento en el centro.
+          Aclarar que el teorema sigue siendo valido, pero la recuperacion con filtro paso bajo requiere separacion.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           8 · DEMODULACIÓN
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">El camino de vuelta</div>
+        <h2>Demodulación coherente</h2>
+        <p class="subtitle">Multiplicar otra vez por la portadora devuelve la señal a banda base y genera componentes al doble de frecuencia.</p>
+
+        <div class="chain">
+          <div class="node">Señal recibida<br /><span class="mono">s(t) = x(t)cos ω₀t</span></div>
+          <div class="arrow">→</div>
+          <div class="op">×</div>
+          <div class="node">Multiplicador<br /><span class="mono">2cos ω₀t</span></div>
+          <div class="arrow">→</div>
+          <div class="node">Filtro paso bajo<br /><span class="mono">|ω| &lt; B</span></div>
+          <div class="arrow">→</div>
+          <div class="node" style="border-color:rgba(34,211,238,.45);">Señal recuperada<br /><span class="mono">x(t)</span></div>
+        </div>
+
+        <div class="formula-box center" style="font-size:0.9em; margin:8px 0 12px;">
+          \[ s(t)\cos(\omega_0 t)=x(t)\cos^2(\omega_0 t)
+             =\frac{1}{2}x(t)+\frac{1}{2}x(t)\cos(2\omega_0 t) \]
+          \[ \mathcal{F}\{\cdot\}=\underbrace{\tfrac12 X(\omega)}_{\text{banda base}}
+             +\underbrace{\tfrac14\bigl[X(\omega-2\omega_0)+X(\omega+2\omega_0)\bigr]}_{\text{se elimina con el filtro}} \]
+        </div>
+
+        <div class="grid g3" style="gap:10px;">
+          <div class="viz" style="padding:8px 10px;">
+            <svg class="spec-svg" viewBox="0 0 280 104">
+              <line class="axis" x1="8" y1="80" x2="272" y2="80" />
+              <path class="spec-side" d="M72,80 L90,30 L108,80 Z" />
+              <path class="spec-side" d="M172,80 L190,30 L208,80 Z" />
+              <text class="spec-label" x="90" y="96">−f₀</text>
+              <text class="spec-label" x="190" y="96">+f₀</text>
+              <text class="spec-label violet" x="8" y="16">Recibida</text>
+            </svg>
+          </div>
+          <div class="viz" style="padding:8px 10px;">
+            <svg class="spec-svg" viewBox="0 0 280 104">
+              <line class="axis" x1="8" y1="80" x2="272" y2="80" />
+              <path class="spec-msg" d="M120,80 L140,34 L160,80 Z" />
+              <path class="spec-side2" d="M36,80 L44,60 L52,80 Z" />
+              <path class="spec-side2" d="M228,80 L236,60 L244,80 Z" />
+              <text class="spec-label" x="129" y="96">0</text>
+              <text class="spec-label" x="32" y="96">−2f₀</text>
+              <text class="spec-label" x="224" y="96">+2f₀</text>
+              <text class="spec-label cyan" x="8" y="16">Tras multiplicar</text>
+            </svg>
+          </div>
+          <div class="viz" style="padding:8px 10px;">
+            <svg class="spec-svg" viewBox="0 0 280 104">
+              <line class="axis" x1="8" y1="80" x2="272" y2="80" />
+              <rect class="filter-band" x="108" y="24" width="64" height="60" rx="4" />
+              <path class="spec-msg" d="M120,80 L140,34 L160,80 Z" />
+              <text class="spec-label" x="129" y="96">0</text>
+              <text class="spec-label cyan" x="8" y="16">Tras el filtro</text>
+            </svg>
+          </div>
+        </div>
+
+        <aside class="notes">
+          Explicar el factor 2 en el multiplicador: normaliza la ganancia para recuperar exactamente x(t).
+          El filtro paso bajo debe tener corte B, el ancho de banda de la senal mensaje.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           9 · AM INTERACTIVA
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">Modulación en amplitud</div>
+        <h2>AM con portadora</h2>
+        <p class="subtitle">La envolvente sigue a la señal mensaje. El índice de modulación \(\mu\) controla la profundidad.</p>
+
+        <div class="split" style="grid-template-columns:1.15fr 0.85fr; gap:22px; align-items:start;">
+          <div class="viz">
+            <canvas id="amCanvas" width="760" height="330" aria-label="Señal AM en el dominio del tiempo"></canvas>
+            <div class="controls-row">
+              <label for="muRange">Índice μ</label>
+              <input type="range" id="muRange" min="0" max="1.5" step="0.01" value="0.7" />
+              <span class="readout" id="muValue">μ = 0.70</span>
+            </div>
+            <div class="controls-row" style="padding-top:0;">
+              <label for="fmRange">Mensaje</label>
+              <input type="range" id="fmRange" min="0.5" max="3" step="0.1" value="1.5" />
+              <span class="readout" id="fmValue">f<sub>m</sub> = 1.5 kHz</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="formula-box" style="margin-top:0;">
+              <span class="label">Señal AM</span>
+              \[ s_{\text{AM}}(t)=A_c\bigl[1+\mu\,m(t)\bigr]\cos(\omega_c t) \]
+              <p class="muted" style="font-size:0.5em; margin:6px 0 0;">con \(|m(t)|\le 1\) y \(\mu\in[0,1]\) para no sobremodular.</p>
+            </div>
+            <ul class="clean compact" style="font-size:0.9em;">
+              <li>Envolvente: \(A_c[1+\mu m(t)]\).</li>
+              <li>Ancho de banda: \(B_{\text{AM}}=2B\).</li>
+              <li>Potencia: \(P_t=P_c\left(1+\dfrac{\mu^2}{2}\right)\).</li>
+              <li>Un detector de envolvente es suficiente.</li>
+            </ul>
+            <div class="callout warn" id="amWarning" style="display:none;">
+              <span class="icon">!</span>
+              <span><strong>Sobremodulación:</strong> con \(\mu>1\) la envolvente se cruza y un detector simple distorsiona la señal.</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="notes">
+          Subir mu hasta 1.5 para mostrar la sobremodulacion. La envolvente se cruza y la fase se invierte.
+          Relacionar la potencia: con mu=1, la portadora se lleva 2/3 de la potencia total.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           10 · TIPOS DE MODULACIÓN
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">Variantes</div>
+        <h2>Tipos de modulación</h2>
+        <p class="subtitle">El mismo teorema, combinado con filtros y fase, produce familias completas de esquemas.</p>
+
+        <div class="grid g2" style="gap:12px;">
+          <div class="card">
+            <h3>AM-DSB con portadora</h3>
+            <svg class="spec-svg" viewBox="0 0 600 92" style="margin:2px 0 2px;">
+              <line class="axis" x1="40" y1="72" x2="560" y2="72" />
+              <path class="spec-side" d="M172,72 L200,30 L228,72 Z" />
+              <path class="spec-side" d="M372,72 L400,30 L428,72 Z" />
+              <line x1="300" y1="14" x2="300" y2="72" stroke="#22d3ee" stroke-width="3" stroke-linecap="round" />
+              <circle cx="300" cy="12" r="3.5" fill="#22d3ee" />
+              <text class="spec-label cyan" x="300" y="86" text-anchor="middle" style="font-size:15px;">f₀</text>
+              <text class="spec-label violet" x="200" y="86" text-anchor="middle" style="font-size:15px;">LSB</text>
+              <text class="spec-label violet" x="400" y="86" text-anchor="middle" style="font-size:15px;">USB</text>
+            </svg>
+            <p><strong class="accent-cyan">BW = 2B.</strong> Portadora potente, demodulación por envolvente. Simple y robusta, pero poco eficiente en potencia.</p>
+          </div>
+
+          <div class="card violet">
+            <h3>DSB-SC</h3>
+            <svg class="spec-svg" viewBox="0 0 600 92" style="margin:2px 0 2px;">
+              <line class="axis" x1="40" y1="72" x2="560" y2="72" />
+              <path class="spec-side" d="M190,72 L220,24 L250,72 Z" />
+              <path class="spec-side" d="M350,72 L380,24 L410,72 Z" />
+              <line x1="300" y1="34" x2="300" y2="72" stroke="rgba(148,163,184,.45)" stroke-width="1.5" stroke-dasharray="5 6" />
+              <text class="spec-label" x="300" y="26" text-anchor="middle" style="font-size:14px;">f₀ suprimida</text>
+              <text class="spec-label violet" x="220" y="86" text-anchor="middle" style="font-size:15px;">LSB</text>
+              <text class="spec-label violet" x="380" y="86" text-anchor="middle" style="font-size:15px;">USB</text>
+            </svg>
+            <p><strong class="accent-violet">BW = 2B.</strong> Portadora suprimida: toda la potencia va a la información. Exige demodulación coherente.</p>
+          </div>
+
+          <div class="card">
+            <h3>SSB · banda lateral única</h3>
+            <svg class="spec-svg" viewBox="0 0 600 92" style="margin:2px 0 2px;">
+              <line class="axis" x1="40" y1="72" x2="560" y2="72" />
+              <path d="M210,72 L240,34 L270,72 Z" fill="rgba(148,163,184,.08)" stroke="rgba(148,163,184,.35)" stroke-width="1.5" stroke-dasharray="5 5" />
+              <path class="spec-side" d="M350,72 L380,22 L410,72 Z" />
+              <text class="spec-label" x="240" y="86" text-anchor="middle" style="font-size:14px;">LSB suprimida</text>
+              <text class="spec-label cyan" x="380" y="86" text-anchor="middle" style="font-size:15px;">USB</text>
+            </svg>
+            <p><strong class="accent-cyan">BW = B.</strong> La mitad del espectro y de la potencia. Se obtiene filtrando o con la transformada de Hilbert.</p>
+          </div>
+
+          <div class="card violet">
+            <h3>FM / PM · modulación angular</h3>
+            <svg class="spec-svg" viewBox="0 0 600 92" style="margin:2px 0 2px;">
+              <line class="axis" x1="40" y1="72" x2="560" y2="72" />
+              <g stroke="#f472b6" stroke-width="2.4" stroke-linecap="round">
+                <line x1="228" y1="46" x2="228" y2="72" />
+                <line x1="246" y1="34" x2="246" y2="72" />
+                <line x1="264" y1="22" x2="264" y2="72" />
+                <line x1="282" y1="14" x2="282" y2="72" />
+                <line x1="300" y1="10" x2="300" y2="72" />
+                <line x1="318" y1="14" x2="318" y2="72" />
+                <line x1="336" y1="22" x2="336" y2="72" />
+                <line x1="354" y1="34" x2="354" y2="72" />
+                <line x1="372" y1="46" x2="372" y2="72" />
+              </g>
+              <line x1="264" y1="40" x2="336" y2="40" stroke="rgba(244,114,182,.55)" stroke-width="1" stroke-dasharray="3 4" />
+              <text class="spec-label" x="300" y="88" text-anchor="middle" style="font-size:15px;">Δf</text>
+            </svg>
+            <p><strong class="accent-pink">BW ≈ 2(Δf + B).</strong> Envolvente constante: inmune al ruido de amplitud, pero ocupa mucho más espectro.</p>
+          </div>
+        </div>
+
+        <div class="callout" style="margin-top:12px;">
+          <span class="icon">◎</span>
+          <span>Todos los esquemas lineales —AM, DSB, SSB, QAM— son <strong>casos particulares</strong> de multiplicar por una o dos portadoras en cuadratura.</span>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           11 · EJEMPLO NUMÉRICO
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">Ejemplo trabajado</div>
+        <h2>De la teoría a los números</h2>
+
+        <div class="split" style="grid-template-columns:0.9fr 1.1fr; gap:28px; align-items:start;">
+          <div>
+            <div class="card" style="margin-bottom:14px;">
+              <h3>Datos</h3>
+              <p style="font-size:0.62em; color:#cbd7e8;">
+                Señal de voz con banda \(B=4\ \text{kHz}\),<br />
+                portadora \(f_c=100\ \text{kHz}\),<br />
+                velocidad de la luz \(c=3\times10^8\ \text{m/s}\).
+              </p>
+            </div>
+            <div class="formula-box center">
+              <span class="label">Espectro modulado</span>
+              \[ 100\ \text{kHz} \pm 4\ \text{kHz} \]
+              \[ \Rightarrow\ 96\ \text{kHz} \ \text{a}\ 104\ \text{kHz} \]
+            </div>
+            <div class="callout">
+              <span class="icon">✓</span>
+              <span>El receptor solo necesita un filtro de RF de \(8\ \text{kHz}\) centrado en \(100\ \text{kHz}\).</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="grid g2" style="gap:12px; margin-bottom:12px;">
+              <div class="card">
+                <h3>Ancho de banda AM</h3>
+                <span class="big accent-cyan">8 kHz</span>
+                <p>\(B_{\text{AM}}=2B=2(4)=8\ \text{kHz}\).</p>
+              </div>
+              <div class="card violet">
+                <h3>Ancho de banda SSB</h3>
+                <span class="big accent-violet">4 kHz</span>
+                <p>Se transmite una sola banda lateral: la mitad del espectro.</p>
+              </div>
+              <div class="card">
+                <h3>Antena a la portadora</h3>
+                <span class="big accent-cyan">750 m</span>
+                <p>\(\lambda/4=c/(4f_c)=3\times10^8/(4\times10^5)\).</p>
+              </div>
+              <div class="card violet">
+                <h3>Antena sin modular</h3>
+                <span class="big accent-pink">18.75 km</span>
+                <p>\(\lambda/4=c/(4B)=3\times10^8/(1.6\times10^4)\).</p>
+              </div>
+            </div>
+            <div class="callout warn">
+              <span class="icon">!</span>
+              <span>Sin modular, la antena sería <strong>casi 57 veces más alta</strong> que la Torre Eiffel. A \(100\ \text{kHz}\) aún se necesita una torre de radiodifusión; a \(100\ \text{MHz}\) bastaría una antena de <strong>0.75 m</strong>.</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="notes">
+          Recorrer los calculos con la audiencia. 3e8/(4*1e5) = 750 m. 3e8/(4*4e3) = 18750 m = 18.75 km.
+          Comparacion: 18.75 km / 330 m de la Torre Eiffel es aproximadamente 57 veces.
+          A 100 MHz, lambda/4 = 0.75 m: una antena portatil.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           12 · APLICACIONES
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">En el mundo real</div>
+        <h2>Dónde aparece el teorema</h2>
+        <p class="subtitle">Cada vez que sintonizas una emisora o conectas el WiFi, hay una multiplicación por un coseno en algún lugar del sistema.</p>
+
+        <div class="grid g3" style="gap:12px;">
+          <div class="card">
+            <h3><span class="num">AM</span>Radio AM</h3>
+            <p>530–1700 kHz. DSB con portadora; demodulación por envolvente. Larga distancia, baja fidelidad.</p>
+          </div>
+          <div class="card">
+            <h3><span class="num">FM</span>Radio FM</h3>
+            <p>88–108 MHz. Modulación angular; alta fidelidad y resistencia al ruido. BW de 200 kHz por emisora.</p>
+          </div>
+          <div class="card">
+            <h3><span class="num">TV</span>Televisión digital</h3>
+            <p>UHF y VHF con OFDM y QAM. Muchas subportadoras, cada una desplazada en frecuencia.</p>
+          </div>
+          <div class="card violet">
+            <h3><span class="num">WiFi</span>WiFi 6/7</h3>
+            <p>2.4, 5 y 6 GHz. OFDM con QAM de hasta 4096 puntos sobre portadoras en cuadratura.</p>
+          </div>
+          <div class="card violet">
+            <h3><span class="num">5G</span>5G NR</h3>
+            <p>Sub-6 GHz y mmWave. QAM y OFDM: el teorema de la modulación en su forma I/Q.</p>
+          </div>
+          <div class="card violet">
+            <h3><span class="num">GPS</span>GPS y radar</h3>
+            <p>Portadoras de microondas con modulación de espectro ensanchado y pulsos codificados.</p>
+          </div>
+        </div>
+
+        <div class="callout" style="margin-top:14px;">
+          <span class="icon">◎</span>
+          <span>Radio, TV, telefonía, satélites, radar y fibra óptica comparten la misma operación: <strong>trasladar el espectro de la información a una banda útil</strong>.</span>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           13 · I/Q Y QAM
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">Más allá</div>
+        <h2>Dos portadoras en cuadratura: I/Q</h2>
+        <p class="subtitle">Un coseno y un seno a la misma frecuencia son ortogonales: pueden transportar dos mensajes independientes.</p>
+
+        <div class="split" style="grid-template-columns:1.15fr 0.85fr; gap:26px; align-items:start;">
+          <div>
+            <div class="formula-box center">
+              <span class="label">Modulador I/Q</span>
+              \[ s(t)=I(t)\cos(\omega_c t)-Q(t)\sin(\omega_c t) \]
+            </div>
+            <ul class="clean compact">
+              <li>\(I(t)\): componente <strong>en fase</strong>; \(Q(t)\): componente <strong>en cuadratura</strong>.</li>
+              <li>Aplicando el teorema a cada término se obtienen dos pares de réplicas independientes.</li>
+              <li>El receptor multiplica por \(\cos\) y por \(\sin\) y filtra: separa \(I\) y \(Q\) sin interferencia.</li>
+              <li>Así se construye <strong>QAM</strong>: \(M\) símbolos = \(\log_2 M\) bits por símbolo.</li>
+            </ul>
+            <div class="callout">
+              <span class="icon">✓</span>
+              <span>16-QAM transmite <strong>4 bits</strong> por símbolo con 16 combinaciones de 4 amplitudes en I y 4 en Q; 64-QAM usa 6 bits; 256-QAM, 8 bits.</span>
+            </div>
+          </div>
+
+          <div class="viz" style="text-align:center;">
+            <svg class="constellation" viewBox="0 0 240 240" aria-label="Constelación 16-QAM">
+              <line class="axis" x1="30" y1="120" x2="210" y2="120" />
+              <line class="axis" x1="120" y1="30" x2="120" y2="210" />
+              <!-- 16 puntos -->
+              <g>
+                <circle cx="75" cy="75" r="6" /><circle cx="105" cy="75" r="6" /><circle cx="135" cy="75" r="6" /><circle cx="165" cy="75" r="6" />
+                <circle cx="75" cy="105" r="6" /><circle cx="105" cy="105" r="6" /><circle cx="135" cy="105" r="6" /><circle cx="165" cy="105" r="6" />
+                <circle cx="75" cy="135" r="6" /><circle cx="105" cy="135" r="6" /><circle cx="135" cy="135" r="6" /><circle cx="165" cy="135" r="6" />
+                <circle cx="75" cy="165" r="6" /><circle cx="105" cy="165" r="6" /><circle cx="135" cy="165" r="6" /><circle cx="165" cy="165" r="6" />
+              </g>
+              <text class="spec-label" x="196" y="112">I</text>
+              <text class="spec-label" x="128" y="38">Q</text>
+              <text class="spec-label cyan" x="52" y="225">16-QAM · 4 bits/símbolo</text>
+            </svg>
+          </div>
+        </div>
+
+        <aside class="notes">
+          Destacar la ortogonalidad: la integral de cos*sin en un periodo es cero. Por eso I y Q no se mezclan.
+          QAM es la base de WiFi, LTE, 5G y TV digital por cable.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           14 · CONCLUSIONES
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">Cierre</div>
+        <h2>Cuatro ideas para llevarse</h2>
+
+        <div class="grid g2" style="gap:14px; margin-top:22px;">
+          <div class="card" style="padding:20px 22px;">
+            <h3><span class="num">1</span>Una operación, dos réplicas</h3>
+            <p style="font-size:0.62em;">Multiplicar por \(\cos(\omega_0 t)\) copia el espectro en \(\pm\omega_0\) y reduce la amplitud a la mitad.</p>
+          </div>
+          <div class="card violet" style="padding:20px 22px;">
+            <h3><span class="num">2</span>La demostración es corta</h3>
+            <p style="font-size:0.62em;">Euler + linealidad + desplazamiento en frecuencia. No hace falta nada más.</p>
+          </div>
+          <div class="card violet" style="padding:20px 22px;">
+            <h3><span class="num">3</span>Modular y demodular son simétricos</h3>
+            <p style="font-size:0.62em;">Multiplicar de nuevo por la portadora devuelve la señal a banda base; un filtro elimina los términos en \(2\omega_0\).</p>
+          </div>
+          <div class="card" style="padding:20px 22px;">
+            <h3><span class="num">4</span>Es la base de las comunicaciones</h3>
+            <p style="font-size:0.62em;">AM, FM, SSB, QAM, WiFi y 5G son variantes de la misma idea: mover el espectro a donde conviene.</p>
+          </div>
+        </div>
+
+        <div class="formula-box center" style="margin-top:20px;">
+          <span class="label">En una línea</span>
+          \[ \text{modular} \;=\; \text{multiplicar por una portadora} \;=\; \text{desplazar el espectro} \]
+        </div>
+      </section>
+
+      <!-- ============================================================
+           15 · REFERENCIAS
+           ============================================================ -->
+      <section>
+        <div class="eyebrow">Para profundizar</div>
+        <h2>Referencias</h2>
+
+        <div class="split" style="grid-template-columns:1.1fr 0.9fr; gap:30px; align-items:start;">
+          <ul class="refs">
+            <li><strong>Oppenheim, A. V. &amp; Willsky, A. S.</strong> <em>Signals and Systems</em>, 2.ª ed. Pearson, 1997. Cap. 4: propiedades de la transformada de Fourier.</li>
+            <li><strong>Proakis, J. G. &amp; Salehi, M.</strong> <em>Fundamentals of Communication Systems</em>, 2.ª ed. Pearson, 2014. Cap. 3–4: modulación AM y demodulación.</li>
+            <li><strong>Haykin, S. &amp; Moher, M.</strong> <em>Communication Systems</em>, 5.ª ed. Wiley, 2009. Cap. 3: modulación de amplitud.</li>
+            <li><strong>Lathi, B. P. &amp; Ding, Z.</strong> <em>Modern Digital and Analog Communication Systems</em>, 5.ª ed. Oxford, 2018.</li>
+            <li><strong>Reveal.js</strong> — documentación oficial: <span class="mono">revealjs.com</span> · <strong>MathJax 3</strong>: <span class="mono">mathjax.org</span></li>
+          </ul>
+
+          <div style="text-align:center;">
+            <div class="final-title">¿Preguntas?</div>
+            <p class="muted" style="font-size:0.6em; line-height:1.5;">
+              El código fuente y las instrucciones para publicar esta presentación
+              en GitHub Pages están en el archivo <span class="mono accent-cyan">README.md</span>.
+            </p>
+            <div class="pill" style="margin-top:10px;">Hecho con reveal.js 6 · MathJax 3</div>
+            <p class="footer-note">Navega con ← → · Pulsa O para ver todas las diapositivas</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="dist/reveal.js"></script>
+  <script src="dist/plugin/notes.js"></script>
+  <script src="dist/plugin/math.js"></script>
+  <script src="js/presentation.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      history: true,
+      controls: true,
+      progress: true,
+      center: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      backgroundTransition: 'fade',
+      width: 1280,
+      height: 720,
+      margin: 0.055,
+      minScale: 0.2,
+      maxScale: 1.6,
+      plugins: [RevealMath.MathJax3, RevealNotes],
+      mathjax3: {
+        mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
+        tex: {
+          inlineMath: [['\\(', '\\)']],
+          displayMath: [['\\[', '\\]']]
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      }
+    });
+  </script>
+</body>
+</html>
