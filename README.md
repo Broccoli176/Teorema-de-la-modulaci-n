@@ -3,6 +3,9 @@
 Presentación académica construida con **reveal.js 6.0.2** (incluido localmente) y **MathJax 3** (vía CDN).
 No requiere instalar dependencias ni ejecutar procesos de compilación: basta con abrir `index.html`.
 
+- **Presentación en vivo:** https://broccoli176.github.io/Teorema-de-la-modulaci-n/
+- **Repositorio público:** https://github.com/Broccoli176/Teorema-de-la-modulaci-n
+
 ## Contenido
 
 1. Portada
@@ -52,33 +55,33 @@ Luego visita `http://localhost:8000`.
 
 ## Publicar en GitHub Pages
 
-1. Crea un repositorio **público** en GitHub, por ejemplo `teorema-modulacion`.
-2. Sube todo el contenido de esta carpeta:
+El repositorio ya está creado y publicado en:
 
-   ```bash
-   git init
-   git add .
-   git commit -m "Presentación: Teorema de la modulación"
-   git branch -M main
-   git remote add origin https://github.com/<usuario>/<repo>.git
-   git push -u origin main
-   ```
+- **Repositorio:** https://github.com/Broccoli176/Teorema-de-la-modulaci-n
+- **Sitio:** https://broccoli176.github.io/Teorema-de-la-modulaci-n/
 
-3. En GitHub, entra en **Settings → Pages**.
-4. En *Build and deployment*, selecciona **Deploy from a branch**.
-5. Elige la rama `main` y la carpeta `/ (root)`. Guarda los cambios.
-6. Espera uno o dos minutos. La presentación quedará disponible en:
+Para actualizar el contenido, sube los cambios a la rama `main`:
 
-   ```
-   https://<usuario>.github.io/<repo>/
-   ```
+```bash
+git init
+git add .
+git commit -m "Actualizar presentación"
+git branch -M main
+git remote add origin https://github.com/Broccoli176/Teorema-de-la-modulaci-n.git
+git push -u origin main
+```
+
+Si el sitio devuelve 404, revisa en GitHub:
+
+1. **Settings → Pages**.
+2. En *Build and deployment*, selecciona **Deploy from a branch**.
+3. Elige la rama `main` y la carpeta `/ (root)`. Guarda los cambios.
+4. Espera uno o dos minutos y recarga el sitio.
 
 ### Enlaces del grupo
 
-- **Presentación en GitHub Pages:** `https://<usuario>.github.io/<repo>/`
-- **Repositorio público:** `https://github.com/<usuario>/<repo>`
-
-> Sustituye `<usuario>` y `<repo>` por los datos reales del repositorio.
+- **Presentación en GitHub Pages:** https://broccoli176.github.io/Teorema-de-la-modulaci-n/
+- **Repositorio público:** https://github.com/Broccoli176/Teorema-de-la-modulaci-n
 
 ## Estructura del proyecto
 
