@@ -112,12 +112,37 @@ Si el sitio devuelve 404, revisa en GitHub:
 
 - [reveal.js](https://revealjs.com/) — framework de presentaciones (MIT).
 - [MathJax 3](https://www.mathjax.org/) — renderizado de fórmulas (Apache 2.0), cargado desde jsDelivr.
-- Tipografías: *Source Sans Pro* va embebida en `dist/theme/black.css`; el resto usa fuentes del sistema.
+- Tipografías: *Space Grotesk*, *Inter* y *JetBrains Mono* desde Google Fonts (con fuentes del sistema como respaldo).
 
 ## Nota sobre las dependencias
 
 - **reveal.js** está incluido en `dist/`, por lo que la presentación funciona sin conexión.
 - **MathJax** se carga desde CDN (`cdn.jsdelivr.net`). Si no hay conexión, las fórmulas se muestran como texto LaTeX sin renderizar; el resto de la presentación sigue funcionando.
+- Las **tipografías** se cargan desde Google Fonts; sin conexión se usan las fuentes del sistema.
+
+## Notación
+
+Toda la presentación usa la frecuencia **f en hercios** (no la frecuencia angular ω):
+
+$$x(t)\cos(2\pi f_0 t) \;\longleftrightarrow\; \tfrac{1}{2}\left[X(f-f_0)+X(f+f_0)\right]$$
+
+## Volver a la versión anterior
+
+La versión original (notación en ω, estilo anterior) quedó guardada en git:
+
+- Rama: `version-original`
+- Etiqueta: `v1-original`
+
+```bash
+# Ver la versión anterior sin perder la actual
+git switch version-original
+
+# Volver a la versión nueva
+git switch main
+
+# Restaurar main a la versión original (descarta la nueva)
+git reset --hard v1-original
+```
 
 ## Licencia
 
